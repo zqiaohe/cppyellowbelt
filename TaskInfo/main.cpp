@@ -35,20 +35,36 @@ public:
       const string& person, int task_count) {
       //1) приведем task_count к количеству невыполненных задач
       //количество невыполненных задач
-      int undone_tasks = Persons[person][TaskStatus::NEW] +
-                            Persons[person][TaskStatus::IN_PROGRESS] +
-                                Persons[person][TaskStatus::TESTING];
-      if (task_count > undone_tasks) { task_count = undone_tasks;}
+      int New = Persons[person][TaskStatus::NEW],
+          In_progress = Persons[person][TaskStatus::IN_PROGRESS],
+          Testing = Persons[person][TaskStatus::TESTING];
+      int undone_tasks = New + In_progress + Testing;
+
+
+      if (task_count > undone_tasks) { task_count = undone_tasks; }
       //переведем новые задачи
-      if (Persons[person][TaskStatus::NEW]<task_count) {
-            // переводим задачи в IN_PROGRESS
-            Persons[person][TaskStatus::IN_PROGRESS] = Persons[person][TaskStatus::IN_PROGRESS]+
-                                                                Persons[person][TaskStatus::NEW];
-            //обнуляем новые задачи
-            Persons[person][TaskStatus::NEW] = 0;
-            //меняем task_count
-            task_count = task_count - Persons[person][TaskStatus::NEW];}
-      };
+      if (task_count - New > 0) {
+          task_count = task_count - New;
+          Persons[person][TaskStatus::NEW] = 0;
+          int New_in_progress = New;
+      }
+      else {
+          if (task_count - New < 0) {
+            task_count = 0;
+            Persons[person][TaskStatus::NEW] = New - task_count;
+
+      }
+//тестинг
+      if (task_count - In_progress > 0) {
+          task_count = task_count - In_progress;
+          Persons[person][TaskStatus::IN_PROGRESS] = 0;
+          Persons[person][TaskStatus::TESTING] = Testing + In_progress;
+      }
+      else {
+          if (task_count - In_progress < 0) {
+            task_count = 0;
+            Persons[person][TaskStatus::NEW] = New - task_count;
+      }
 };
 void PrintTasksInfo(TasksInfo tasks_info) {
   cout << tasks_info[TaskStatus::NEW] << " new tasks" <<
