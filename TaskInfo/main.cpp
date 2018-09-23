@@ -4,16 +4,7 @@
 
 using namespace std;
 // Перечислимый тип для статуса задачи
-enum class TaskStatus {
-  NEW,          // новая
-  IN_PROGRESS,  // в разработке
-  TESTING,      // на тестировании
-  DONE          // завершена
-};
 
-// Объявляем тип-синоним для map<TaskStatus, int>,
-// позволяющего хранить количество задач каждого статуса
-using TasksInfo = map<TaskStatus, int>;
 
 class TeamTasks {
      map <string, TasksInfo> Persons;
@@ -66,18 +57,18 @@ public:
       }
 //in progress
       if (task_count - In_progress > 0) {
-          Persons[person][TaskStatus::IN_PROGRESS] = 0;
+          Persons[person][TaskStatus::IN_PROGRESS] = 0 + New_to_in_progress;
           In_progress_to_testing = In_progress;
           task_count = task_count - In_progress;
       }
       else {
           if (task_count - In_progress < 0) {
-            Persons[person][TaskStatus::IN_PROGRESS] = In_progress - task_count;
+            Persons[person][TaskStatus::IN_PROGRESS] = In_progress - task_count + New_to_in_progress;
             In_progress_to_testing = In_progress - task_count;
             task_count = 0;
             }
           else {
-            Persons[person][TaskStatus::IN_PROGRESS] = 0;
+            Persons[person][TaskStatus::IN_PROGRESS] = 0 + New_to_in_progress;
             In_progress_to_testing = task_count;
             task_count = 0;
           }
@@ -85,23 +76,23 @@ public:
 
 //testing
       if (task_count - Testing > 0) {
-          Persons[person][TaskStatus::TESTING] = 0;
+          Persons[person][TaskStatus::TESTING] = 0 + In_progress_to_testing;
           Testing_to_done = Testing;
           task_count = task_count - Testing;
       }
       else {
           if (task_count - Testing < 0) {
-            Persons[person][TaskStatus::TESTING] = Testing - task_count;
+            Persons[person][TaskStatus::TESTING] = Testing - task_count + In_progress_to_testing;
             Testing_to_done = Testing - task_count;
             task_count = 0;
             }
           else {
-            Persons[person][TaskStatus::TESTING] = 0;
+            Persons[person][TaskStatus::TESTING] = 0 + In_progress_to_testing;
             Testing_to_done = task_count;
             task_count = 0;
           }
       }
-
+Persons[person][TaskStatus::DONE] = Persons[person][TaskStatus::DONE] + Testing_to_done;
 if (New - New_to_in_progress > 0)
     {untouched[TaskStatus::NEW] = New - New_to_in_progress;}
 if (In_progress - In_progress_to_testing > 0)
